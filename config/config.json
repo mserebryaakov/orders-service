@@ -6,10 +6,10 @@
     "mongodb": {
         "host": "localhost",
         "port": "27017",
-        "database": "product-service-users",
+        "database": "delivery-service",
         "username": null,
         "password": null,
-        "collection": "users",
+        "collection": "order",
         "authdb": null
     }
 }

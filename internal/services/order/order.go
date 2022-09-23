@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"orders-service/internal/domain/order"
-	repository "orders-service/internal/domain/order/mongo"
+	repository "orders-service/internal/domain/order"
 )
 
 type OrderUseCase struct {
@@ -30,6 +30,24 @@ func (s *OrderUseCase) FindOne(ctx context.Context, id string) (o order.Order, e
 	o, err = s.repo.FindOne(ctx, id)
 	if err != nil {
 		return o, fmt.Errorf("OrderUseCase - FindOne - s.repo.FindOne: %v", err)
+	}
+
+	return
+}
+
+func (s *OrderUseCase) Update(ctx context.Context, order order.Order) (err error) {
+	err = s.repo.Update(ctx, order)
+	if err != nil {
+		return fmt.Errorf("OrderUseCase - Update - s.repo.Update: %v", err)
+	}
+
+	return
+}
+
+func (s *OrderUseCase) Delete(ctx context.Context, id string) (err error) {
+	err = s.repo.Delete(ctx, id)
+	if err != nil {
+		return fmt.Errorf("OrderUseCase - Delete - s.repo.Delete: %v", err)
 	}
 
 	return

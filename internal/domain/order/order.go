@@ -14,6 +14,6 @@ const (
 
 type Order struct {
 	ID          string      `json:"id" bson:"_id,omitempty"`
-	OrderStatus orderStatus `json:"order_status"`
-	CustomerID  string
+	OrderStatus orderStatus `json:"order_status" bson:"order_status"`
+	CustomerID  string      `json:"customer_id" bson:"customer_id"`
 }

@@ -1,4 +1,4 @@
-package mongo
+package mongodb
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"orders-service/internal/domain/order"
 	"orders-service/pkg/logger"
+
+	repository "orders-service/internal/domain/order"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,7 +19,7 @@ type OrderRepository struct {
 	logger     *logger.Logger
 }
 
-func New(database *mongo.Database, collectionName string, logger *logger.Logger) order.OrderRepository {
+func New(database *mongo.Database, collectionName string, logger *logger.Logger) repository.OrderRepository {
 	return &OrderRepository{
 		collection: database.Collection(collectionName),
 		logger:     logger,

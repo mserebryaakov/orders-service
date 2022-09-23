@@ -1,0 +1,24 @@
+GET http://localhost:8000/v1/order/123
+
+###
+
+POST http://localhost:8000/v1/order/123
+Content-Type: application/json
+
+{}
+
+###
+
+PUT http://localhost:8000/v1/order/123
+Content-Type: application/json
+
+{}
+
+###
+
+DELETE http://localhost:8000/v1/order/123
+Content-Type: application/json
+
+{}
+
+###

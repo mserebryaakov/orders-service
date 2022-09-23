@@ -2,10 +2,13 @@ package app
 
 import (
 	"context"
-	"net/http"
 	"orders-service/config"
+	v1 "orders-service/internal/controller/http/v1"
+	db "orders-service/internal/domain/order/mongodb"
+	service "orders-service/internal/services/order"
 	"orders-service/pkg/httpserver"
 	"orders-service/pkg/logger"
+	"orders-service/pkg/mongodb"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,16 +18,25 @@ import (
 
 // Запуск сервиса
 func Start(cfg config.Config, log *logger.Logger) {
+	// Создание mongodb клиента
+	mongoDBClient, err := mongodb.NewClient(context.Background(), cfg.Db.Host, cfg.Db.Port, cfg.Db.Username,
+		cfg.Db.Password, cfg.Db.Database, cfg.Db.AuthDB)
+	if err != nil {
+		panic(err)
+	}
+
+	// Repository
+	repos := db.New(mongoDBClient, cfg.Db.Collection, log)
+	// Use case
+	services := service.New(repos)
+
+	// Создание роутера и регистрация эндпоинтов
+	router := httprouter.New()
+	handler := v1.NewHandler(log, services)
+	handler.Register(router)
+
 	// Создание объекта сервера
 	server := new(httpserver.Server)
-
-	// Создание роутера
-	router := httprouter.New()
-
-	// Регистрация эндпоинтов
-	router.HandlerFunc(http.MethodGet, "/hello", func(w http.ResponseWriter, r *http.Request) {
-		log.Debug("hello, debug")
-	})
 
 	// Запуск сервера
 	go func() {
