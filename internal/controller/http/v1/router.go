@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	orderURL = "/v1/order:uuid"
+	orderURL = "/v1/order"
 )
 
 type handler struct {

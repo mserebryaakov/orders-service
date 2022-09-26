@@ -1,22 +1,28 @@
-GET http://localhost:8000/v1/order/123
-
-###
-
-POST http://localhost:8000/v1/order/123
+GET http://localhost:8000/v1/order?id=6331550d14bbbf2c0c0cdcad
 Content-Type: application/json
 
 {}
 
 ###
 
-PUT http://localhost:8000/v1/order/123
+POST http://localhost:8000/v1/order
+Content-Type: application/json
+
+{
+    "order_status": "ACCEPTED",
+    "customer_id": "123"
+}
+
+###
+
+PUT http://localhost:8000/v1/order
 Content-Type: application/json
 
 {}
 
 ###
 
-DELETE http://localhost:8000/v1/order/123
+DELETE http://localhost:8000/v1/order
 Content-Type: application/json
 
 {}
