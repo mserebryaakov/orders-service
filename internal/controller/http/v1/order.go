@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	apperror "orders-service/internal/controller/http"
 	"orders-service/internal/domain/order"
 )
 
@@ -19,7 +20,11 @@ func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 
 	order, err := h.orderUseCase.FindOne(ctx, id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == apperror.ErrNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -82,8 +87,13 @@ func (h *handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
 	err = h.orderUseCase.Update(ctx, order)
+
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == apperror.ErrNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -102,7 +112,11 @@ func (h *handler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 
 	err := h.orderUseCase.Delete(ctx, id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == apperror.ErrNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 

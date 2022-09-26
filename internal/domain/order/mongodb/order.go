@@ -7,6 +7,7 @@ import (
 	"orders-service/internal/domain/order"
 	"orders-service/pkg/logger"
 
+	apperror "orders-service/internal/controller/http"
 	repository "orders-service/internal/domain/order"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -52,9 +53,7 @@ func (or *OrderRepository) FindOne(ctx context.Context, id string) (o order.Orde
 	result := or.collection.FindOne(ctx, filter)
 	if result.Err() != nil {
 		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
-			// TODO
-			//return o, apperror.ErrNotFound
-			return o, err
+			return o, apperror.ErrNotFound
 		}
 		return o, fmt.Errorf("Failed to find one user by id: %s; error : %v", id, err)
 	}
@@ -98,9 +97,7 @@ func (or *OrderRepository) Update(ctx context.Context, order order.Order) error 
 	}
 
 	if result.MatchedCount == 0 {
-		return fmt.Errorf("Order not found")
-		// TODO
-		//return apperror.ErrNotFound
+		return apperror.ErrNotFound
 	}
 
 	or.logger.Tracef("Matched %d documents and Modified %d documents", result.MatchedCount, result.ModifiedCount)
@@ -121,9 +118,7 @@ func (or *OrderRepository) Delete(ctx context.Context, id string) error {
 		return fmt.Errorf("Failed to execite query, err: %v", err)
 	}
 	if result.DeletedCount == 0 {
-		// TODO
-		//return apperror.ErrNotFound
-		return fmt.Errorf("Deleted count = 0")
+		return apperror.ErrNotFound
 	}
 	or.logger.Tracef("Deleted %d documents", result.DeletedCount)
 
