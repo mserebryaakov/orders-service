@@ -11,17 +11,22 @@ import (
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
+	if id == "" {
+		http.Error(w, "Id not found", http.StatusBadRequest)
+		return
+	}
+
 	ctx := context.Background()
 
 	order, err := h.orderUseCase.FindOne(ctx, id)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	output, err := json.Marshal(order)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -35,20 +40,27 @@ func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var order order.Order
 	err = json.Unmarshal(body, &order)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	ctx := context.Background()
 
-	h.orderUseCase.CreateItem(ctx, order)
+	id, err := h.orderUseCase.CreateItem(ctx, order)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("content-type", "application/json")
+	w.Write([]byte(id))
 
 	h.log.Info("Create order")
 }
