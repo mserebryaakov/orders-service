@@ -10,7 +10,6 @@ import (
 
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-
 	if id == "" {
 		http.Error(w, "Id not found", http.StatusBadRequest)
 		return
@@ -47,7 +46,7 @@ func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var order order.Order
 	err = json.Unmarshal(body, &order)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -66,13 +65,47 @@ func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
-	w.Write([]byte("Update order"))
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var order order.Order
+	err = json.Unmarshal(body, &order)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := context.Background()
+
+	err = h.orderUseCase.Update(ctx, order)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(204)
 	h.log.Info("Update order")
 }
 
 func (h *handler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "Id not found", http.StatusBadRequest)
+		return
+	}
+
+	ctx := context.Background()
+
+	err := h.orderUseCase.Delete(ctx, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(204)
-	w.Write([]byte("Delete order"))
 	h.log.Info("Delete order")
 }
