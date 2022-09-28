@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"net/http"
 	"orders-service/config"
 	v1 "orders-service/internal/controller/http/v1"
 	db "orders-service/internal/domain/order/mongodb"
@@ -13,7 +14,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "orders-service/cmd/app/docs"
+
 	"github.com/julienschmidt/httprouter"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Запуск сервиса
@@ -34,6 +38,11 @@ func Start(cfg config.Config, log *logger.Logger) {
 	router := httprouter.New()
 	handler := v1.NewHandler(log, services)
 	handler.Register(router)
+
+	// Эндроинт swagger документации
+	router.HandlerFunc(http.MethodGet, "/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8000/swagger/doc.json"),
+	))
 
 	// Создание объекта сервера
 	server := new(httpserver.Server)

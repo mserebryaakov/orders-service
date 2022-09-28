@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
     "order_status": "ACCEPTED",
-    "customer_id": "321"
+    "customer_id": "321321321"
 }
 
 ###

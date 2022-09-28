@@ -10,6 +10,17 @@ import (
 )
 
 // Получение заказа по id
+// @Summary      Get order
+// @Description  Get order by ID
+// @Tags         Order
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Order ID"
+// @Success      200  {object}  order.Order
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /v1/order{id} [get]
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	// Получение id из параметра запроса
 	id := r.URL.Query().Get("id")
