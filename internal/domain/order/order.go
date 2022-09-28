@@ -1,5 +1,6 @@
 package order
 
+// Статусы заказа
 type orderStatus string
 
 const (
@@ -12,6 +13,7 @@ const (
 	Delivered      orderStatus = "DELIVERED"
 )
 
+// Модель заказа
 type Order struct {
 	ID          string      `json:"id" bson:"_id,omitempty"`
 	OrderStatus orderStatus `json:"order_status" bson:"order_status"`

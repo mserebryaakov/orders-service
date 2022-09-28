@@ -25,6 +25,7 @@ func NewHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) handlers
 	}
 }
 
+// Регистрация эндпоинтов для работы с заказами
 func (h *handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, orderURL, h.CreateOrder)
 	router.HandlerFunc(http.MethodGet, orderURL, h.GetList)
