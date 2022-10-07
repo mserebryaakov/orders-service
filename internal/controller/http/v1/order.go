@@ -9,18 +9,34 @@ import (
 	"orders-service/internal/domain/order"
 )
 
-// Получение заказа по id
-// @Summary      Get order
-// @Description  Get order by ID
-// @Tags         Order
-// @Accept       json
-// @Produce      json
-// @Param        id   path      string  true  "Order ID"
-// @Success      200  {object}  order.Order
-// @Failure      400  {object}  httputil.HTTPError
-// @Failure      404  {object}  httputil.HTTPError
-// @Failure      500  {object}  httputil.HTTPError
-// @Router       /v1/order{id} [get]
+// swagger:route GET /v1/order order
+//
+// Lists pets filtered by some parameters.
+//
+// This will show all available pets by default.
+// You can get the pets that are out of stock
+//
+//		Consumes:
+//		- application/json
+//
+//		Produces:
+//		- application/json
+//
+//		Schemes: http
+//
+//		Parameters:
+//		  + name: id
+//		    in: query
+//		    description: id
+//		    required: true
+//		    type: string
+//
+//
+//		Responses:
+//		  200: success
+//		  400: bad parameters
+//		  404: order not found
+//	   	  500: server error
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	// Получение id из параметра запроса
 	id := r.URL.Query().Get("id")

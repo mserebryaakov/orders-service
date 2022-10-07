@@ -1,3 +1,15 @@
+// Documentation for Orders API
+//
+// Schemes: http
+// BasePath: /v1
+// Version: 1.0.0
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
 package main
 
 import (
@@ -5,13 +17,6 @@ import (
 	"orders-service/internal/app"
 	"orders-service/pkg/logger"
 )
-
-// @title Order API
-// @version 1.0
-// @description API for Order service
-
-// @host localhost:8000
-// @BasePath /v1/order
 
 func main() {
 	// Получение логгера

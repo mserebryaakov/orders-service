@@ -1,4 +1,4 @@
-GET http://localhost:8000/v1/order?id=63341930b88a177efcf2ef5e
+GET http://localhost:8000/v1/order?id=63402fd0d9fb3649a48c8f28
 Content-Type: application/json
 
 {}
@@ -27,6 +27,13 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:8000/v1/order?id=633167c053f16e46fd4ebd14
+Content-Type: application/json
+
+{}
+
+###
+
+GET http://localhost:8000/docs
 Content-Type: application/json
 
 {}

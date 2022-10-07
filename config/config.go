@@ -39,7 +39,7 @@ func LoadConfig() (Config, error) {
 	// Параметры конфига
 	vp.SetConfigName("config")
 	vp.SetConfigType("json")
-	vp.AddConfigPath("./config/.")
+	vp.AddConfigPath("config")
 
 	// Чтение из config/config.json
 	err := vp.ReadInConfig()

@@ -14,10 +14,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "orders-service/cmd/app/docs"
-
-	"github.com/julienschmidt/httprouter"
-	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/go-chi/chi"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 // Запуск сервиса
@@ -35,14 +33,16 @@ func Start(cfg config.Config, log *logger.Logger) {
 	services := service.New(repos)
 
 	// Создание роутера и регистрация эндпоинтов
-	router := httprouter.New()
+	router := chi.NewRouter()
 	handler := v1.NewHandler(log, services)
 	handler.Register(router)
 
-	// Эндроинт swagger документации
-	router.HandlerFunc(http.MethodGet, "/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8000/swagger/doc.json"),
-	))
+	// Эндпоинт swagger документации
+	ops := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(ops, nil)
+	router.Handle("/docs", sh)
+
+	router.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// Создание объекта сервера
 	server := new(httpserver.Server)

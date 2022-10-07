@@ -1,7 +1,7 @@
 package http
 
-import "github.com/julienschmidt/httprouter"
+import "github.com/go-chi/chi"
 
 type Handler interface {
-	Register(router *httprouter.Router)
+	Register(router *chi.Mux)
 }
