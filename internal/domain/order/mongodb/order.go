@@ -7,7 +7,7 @@ import (
 	"orders-service/internal/domain/order"
 	"orders-service/pkg/logger"
 
-	apperror "orders-service/internal/controller/http"
+	apperror "orders-service/internal/controller/http/apperror"
 	repository "orders-service/internal/domain/order"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +20,7 @@ type OrderRepository struct {
 	logger     *logger.Logger
 }
 
-func New(database *mongo.Database, collectionName string, logger *logger.Logger) repository.OrderRepository {
+func NewOrderRepository(database *mongo.Database, collectionName string, logger *logger.Logger) repository.OrderRepository {
 	return &OrderRepository{
 		collection: database.Collection(collectionName),
 		logger:     logger,
@@ -61,7 +61,7 @@ func (or *OrderRepository) FindOne(ctx context.Context, id string) (o order.Orde
 		return o, fmt.Errorf("Failed to decode order (id: %s) from db error : %v", id, err)
 	}
 
-	or.logger.Tracef("FindOne order: %s", o)
+	or.logger.Info("FindOne order: %s", o)
 	return o, nil
 }
 

@@ -12,7 +12,7 @@ type OrderUseCase struct {
 }
 
 // Создание usecase
-func New(or repository.OrderRepository) *OrderUseCase {
+func NewOrderService(or repository.OrderRepository) *OrderUseCase {
 	return &OrderUseCase{
 		repo: or,
 	}

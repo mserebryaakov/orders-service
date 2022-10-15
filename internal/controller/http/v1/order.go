@@ -5,43 +5,57 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	apperror "orders-service/internal/controller/http"
+	handlers "orders-service/internal/controller/http"
+	apperror "orders-service/internal/controller/http/apperror"
 	"orders-service/internal/domain/order"
+	service "orders-service/internal/services/order"
+	"orders-service/pkg/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
-// swagger:route GET /v1/order order
-//
-// Lists pets filtered by some parameters.
-//
-// This will show all available pets by default.
-// You can get the pets that are out of stock
-//
-//		Consumes:
-//		- application/json
-//
-//		Produces:
-//		- application/json
-//
-//		Schemes: http
-//
-//		Parameters:
-//		  + name: id
-//		    in: query
-//		    description: id
-//		    required: true
-//		    type: string
-//
-//
-//		Responses:
-//		  200: success
-//		  400: bad parameters
-//		  404: order not found
-//	   	  500: server error
-func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
+const (
+	orderURL = "/v1/order"
+)
+
+type ordersHandler struct {
+	log          *logger.Logger
+	orderUseCase *service.OrderUseCase
+}
+
+func NewOrdersHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) handlers.Handler {
+	return &ordersHandler{
+		log:          log,
+		orderUseCase: orderUseCase,
+	}
+}
+
+// Регистрация эндпоинтов для работы с заказами
+func (h *ordersHandler) Register(router *gin.Engine) {
+	router.POST(orderURL, h.CreateOrder)
+	router.GET(orderURL, h.GetList)
+	router.PUT(orderURL, h.UpdateOrder)
+	router.DELETE(orderURL, h.DeleteOrder)
+}
+
+// Получение заказа по id
+// @Summary      Get order
+// @Tags order
+// @Description  Get order by ID
+// @Produce      application/json
+// @Param        id query string true "Order ID"
+// @Success      200  {object}  order.Order "Success get order"
+// @Failure		 400  {object}  UploadResponse "Invalid parameters"
+// @Failure		 404  {object}  UploadResponse "Order not found"
+// @Failure		 500  {object}  UploadResponse "Server error"
+// @Router       /v1/order [get]
+func (h *ordersHandler) GetList(c *gin.Context) {
 	// Получение id из параметра запроса
-	id := r.URL.Query().Get("id")
+	id := c.Query("id")
 	if id == "" {
-		http.Error(w, "Id not found", http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: "Id not found",
+		})
 		return
 	}
 
@@ -51,33 +65,39 @@ func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	order, err := h.orderUseCase.FindOne(ctx, id)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			c.Writer.WriteHeader(404)
 		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, &UploadResponse{
+				Msg: err.Error(),
+			})
 		}
 		return
 	}
 
-	// Преобразование Order в json
-	output, err := json.Marshal(order)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("content-type", "application/json")
-	w.Write(output)
-
 	h.log.Info("GetList")
+
+	// Успешный ответ
+	c.JSON(http.StatusOK, order)
 }
 
 // Создание заказа
-func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
+// @Summary      Create order
+// @Tags order
+// @Description  Create order
+// @Accept		 application/json
+// @Produce      application/json
+// @Param        order body order.Order true "Order object"
+// @Success      200  {object}  IdResponse "Success create"
+// @Failure		 400  {object}  UploadResponse "Invalid body"
+// @Failure		 500  {object}  UploadResponse "Server error"
+// @Router       /v1/order [post]
+func (h *ordersHandler) CreateOrder(c *gin.Context) {
 	// Чтение body
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
+	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: err.Error(),
+		})
 		return
 	}
 
@@ -86,7 +106,9 @@ func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	// Десериализация из json
 	err = json.Unmarshal(body, &order)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: err.Error(),
+		})
 		return
 	}
 
@@ -95,23 +117,39 @@ func (h *handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	// Создание заказа usecase
 	id, err := h.orderUseCase.CreateItem(ctx, order)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, &UploadResponse{
+			Msg: err.Error(),
+		})
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
-	w.Write([]byte(id))
-
 	h.log.Info("Create order")
+
+	// Успешный ответ
+	c.JSON(http.StatusOK, &IdResponse{
+		Id: id,
+	})
 }
 
 // Обновление заказа
-func (h *handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
+// @Summary      Update order
+// @Tags order
+// @Description  Update order
+// @Accept		 application/json
+// @Produce      application/json
+// @Param        order body order.Order true "Order object"
+// @Success      200
+// @Failure		 400  {object}  UploadResponse "Invalid body"
+// @Failure		 404  {object}  UploadResponse "Order not found"
+// @Failure		 500  {object}  UploadResponse "Server error"
+// @Router       /v1/order [put]
+func (h *ordersHandler) UpdateOrder(c *gin.Context) {
 	// Чтение body
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
+	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: err.Error(),
+		})
 		return
 	}
 
@@ -120,7 +158,9 @@ func (h *handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 	// Десериализация из json
 	err = json.Unmarshal(body, &order)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: err.Error(),
+		})
 		return
 	}
 
@@ -130,23 +170,38 @@ func (h *handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 	err = h.orderUseCase.Update(ctx, order)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			c.Writer.WriteHeader(404)
 		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, &UploadResponse{
+				Msg: err.Error(),
+			})
 		}
 		return
 	}
 
-	w.WriteHeader(204)
 	h.log.Info("Update order")
+
+	// Успешный ответ
+	c.Writer.WriteHeader(200)
 }
 
 // Удаление заказа по id
-func (h *handler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+// @Summary      Delete order
+// @Tags order
+// @Description  Delete order by ID
+// @Param        id query string true "Order ID"
+// @Success      200
+// @Failure		 400  {object}  UploadResponse "Invalid parameters"
+// @Failure		 404  {object}  UploadResponse "Order not found"
+// @Failure		 500  {object}  UploadResponse "Server error"
+// @Router       /v1/order [delete]
+func (h *ordersHandler) DeleteOrder(c *gin.Context) {
 	// Получение id из параметра запроса
-	id := r.URL.Query().Get("id")
+	id := c.Query("id")
 	if id == "" {
-		http.Error(w, "Id not found", http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, &UploadResponse{
+			Msg: "Id not found",
+		})
 		return
 	}
 
@@ -156,13 +211,16 @@ func (h *handler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 	err := h.orderUseCase.Delete(ctx, id)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			c.Writer.WriteHeader(404)
 		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, &UploadResponse{
+				Msg: err.Error(),
+			})
 		}
 		return
 	}
 
-	w.WriteHeader(204)
 	h.log.Info("Delete order")
+
+	c.Writer.WriteHeader(200)
 }

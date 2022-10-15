@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	"net/http"
 	"orders-service/config"
+	_ "orders-service/docs"
 	v1 "orders-service/internal/controller/http/v1"
 	db "orders-service/internal/domain/order/mongodb"
 	service "orders-service/internal/services/order"
@@ -14,8 +14,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-chi/chi"
-	"github.com/go-openapi/runtime/middleware"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Запуск сервиса
@@ -27,22 +29,19 @@ func Start(cfg config.Config, log *logger.Logger) {
 		panic(err)
 	}
 
-	// Repository
-	repos := db.New(mongoDBClient, cfg.Db.Collection, log)
-	// Use case
-	services := service.New(repos)
+	// Репозиторий заказов
+	repos := db.NewOrderRepository(mongoDBClient, cfg.Db.Collection, log)
+	// Сервис заказов
+	services := service.NewOrderService(repos)
+	// Handlers
+	orderHandler := v1.NewOrdersHandler(log, services)
 
-	// Создание роутера и регистрация эндпоинтов
-	router := chi.NewRouter()
-	handler := v1.NewHandler(log, services)
-	handler.Register(router)
-
-	// Эндпоинт swagger документации
-	ops := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
-	sh := middleware.Redoc(ops, nil)
-	router.Handle("/docs", sh)
-
-	router.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+	// Роутер
+	router := gin.New()
+	// Инициализация swagger docs
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// Регистрация orders handlers
+	orderHandler.Register(router)
 
 	// Создание объекта сервера
 	server := new(httpserver.Server)
@@ -59,7 +58,7 @@ func Start(cfg config.Config, log *logger.Logger) {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
 	oscall := <-interrupt
-	log.Infof("app.Start() - signal, %s", oscall)
+	log.Infof("Shutdown server, %s", oscall)
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		log.Errorf("Error occured on server shutting down: %v", err)

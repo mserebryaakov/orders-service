@@ -1,7 +1,9 @@
 package http
 
-import "github.com/go-chi/chi"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Handler interface {
-	Register(router *chi.Mux)
+	Register(router *gin.Engine)
 }
