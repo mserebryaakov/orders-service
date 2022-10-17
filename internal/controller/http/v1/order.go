@@ -2,8 +2,6 @@ package v1
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	handlers "orders-service/internal/controller/http"
 	apperror "orders-service/internal/controller/http/apperror"
@@ -15,7 +13,7 @@ import (
 )
 
 const (
-	orderURL = "/v1/order"
+	orderURL = "/order"
 )
 
 type ordersHandler struct {
@@ -32,10 +30,13 @@ func NewOrdersHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) ha
 
 // Регистрация эндпоинтов для работы с заказами
 func (h *ordersHandler) Register(router *gin.Engine) {
-	router.POST(orderURL, h.CreateOrder)
-	router.GET(orderURL, h.GetList)
-	router.PUT(orderURL, h.UpdateOrder)
-	router.DELETE(orderURL, h.DeleteOrder)
+	v1 := router.Group("/v1")
+	{
+		v1.POST(orderURL, h.createOrder)
+		v1.GET(orderURL, h.getList)
+		v1.PUT(orderURL, h.updateOrder)
+		v1.DELETE(orderURL, h.deleteOrder)
+	}
 }
 
 // Получение заказа по id
@@ -49,7 +50,7 @@ func (h *ordersHandler) Register(router *gin.Engine) {
 // @Failure		 404  {object}  UploadResponse "Order not found"
 // @Failure		 500  {object}  UploadResponse "Server error"
 // @Router       /v1/order [get]
-func (h *ordersHandler) GetList(c *gin.Context) {
+func (h *ordersHandler) getList(c *gin.Context) {
 	// Получение id из параметра запроса
 	id := c.Query("id")
 	if id == "" {
@@ -91,21 +92,11 @@ func (h *ordersHandler) GetList(c *gin.Context) {
 // @Failure		 400  {object}  UploadResponse "Invalid body"
 // @Failure		 500  {object}  UploadResponse "Server error"
 // @Router       /v1/order [post]
-func (h *ordersHandler) CreateOrder(c *gin.Context) {
-	// Чтение body
-	body, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: err.Error(),
-		})
-		return
-	}
-
+func (h *ordersHandler) createOrder(c *gin.Context) {
 	var order order.Order
 
-	// Десериализация из json
-	err = json.Unmarshal(body, &order)
-	if err != nil {
+	// Валидация body
+	if err := c.BindJSON(&order); err != nil {
 		c.JSON(http.StatusBadRequest, &UploadResponse{
 			Msg: err.Error(),
 		})
@@ -143,21 +134,11 @@ func (h *ordersHandler) CreateOrder(c *gin.Context) {
 // @Failure		 404  {object}  UploadResponse "Order not found"
 // @Failure		 500  {object}  UploadResponse "Server error"
 // @Router       /v1/order [put]
-func (h *ordersHandler) UpdateOrder(c *gin.Context) {
-	// Чтение body
-	body, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: err.Error(),
-		})
-		return
-	}
-
+func (h *ordersHandler) updateOrder(c *gin.Context) {
 	var order order.Order
 
-	// Десериализация из json
-	err = json.Unmarshal(body, &order)
-	if err != nil {
+	// Валидация body
+	if err := c.BindJSON(&order); err != nil {
 		c.JSON(http.StatusBadRequest, &UploadResponse{
 			Msg: err.Error(),
 		})
@@ -167,7 +148,7 @@ func (h *ordersHandler) UpdateOrder(c *gin.Context) {
 	ctx := context.Background()
 
 	// Обновление заказа usecase
-	err = h.orderUseCase.Update(ctx, order)
+	err := h.orderUseCase.Update(ctx, order)
 	if err != nil {
 		if err == apperror.ErrNotFound {
 			c.Writer.WriteHeader(404)
@@ -195,7 +176,7 @@ func (h *ordersHandler) UpdateOrder(c *gin.Context) {
 // @Failure		 404  {object}  UploadResponse "Order not found"
 // @Failure		 500  {object}  UploadResponse "Server error"
 // @Router       /v1/order [delete]
-func (h *ordersHandler) DeleteOrder(c *gin.Context) {
+func (h *ordersHandler) deleteOrder(c *gin.Context) {
 	// Получение id из параметра запроса
 	id := c.Query("id")
 	if id == "" {

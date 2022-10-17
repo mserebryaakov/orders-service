@@ -6,13 +6,14 @@ import (
 
 // Конфиг mongodb
 type DbConfig struct {
-	Host       string `mapstructure:"host"`
-	Port       string `mapstructure:"port"`
-	Database   string `mapstructure:"database"`
-	Username   string `mapstructure:"username"`
-	Password   string `mapstructure:"password"`
-	Collection string `mapstructure:"collection"`
-	AuthDB     string `mapstructure:"authdb"`
+	Host            string `mapstructure:"host"`
+	Port            string `mapstructure:"port"`
+	Database        string `mapstructure:"database"`
+	Username        string `mapstructure:"username"`
+	Password        string `mapstructure:"password"`
+	CollectionOrder string `mapstructure:"collection-order"`
+	CollectionUser  string `mapstructure:"collection-user"`
+	AuthDB          string `mapstructure:"authdb"`
 }
 
 // Конфиг сервера

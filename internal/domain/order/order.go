@@ -16,6 +16,6 @@ const (
 // Модель заказа
 type Order struct {
 	ID          string      `json:"id" bson:"_id,omitempty"`
-	OrderStatus orderStatus `json:"order_status" bson:"order_status"`
-	CustomerID  string      `json:"customer_id" bson:"customer_id"`
+	OrderStatus orderStatus `json:"order_status" bson:"order_status" binding:"required"`
+	CustomerID  string      `json:"customer_id" bson:"customer_id" binding:"required"`
 }

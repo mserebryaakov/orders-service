@@ -9,3 +9,8 @@ type UploadResponse struct {
 type IdResponse struct {
 	Id string `json:"id"`
 }
+
+// Token пользователя
+type TokenResponse struct {
+	Token string `json:"token"`
+}

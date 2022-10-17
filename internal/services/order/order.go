@@ -11,7 +11,7 @@ type OrderUseCase struct {
 	repo repository.OrderRepository
 }
 
-// Создание usecase
+// Создание сервиса взаимодействия с заказами
 func NewOrderService(or repository.OrderRepository) *OrderUseCase {
 	return &OrderUseCase{
 		repo: or,

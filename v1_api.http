@@ -1,4 +1,4 @@
-GET http://localhost:8000/v1/order?id=634d158a9b147262289ec6d0
+GET http://localhost:8000/v1/order?id=634d3def3d0818b430e07dc5
 Content-Type: application/json
 
 {}
@@ -30,5 +30,27 @@ DELETE http://localhost:8000/v1/order?id=634ac85d5de5b1c46d862201
 Content-Type: application/json
 
 {}
+
+###
+
+POST http://localhost:8000/signUp
+Content-Type: application/json
+
+{
+    "firstname": "firstname",
+    "lastname": "lastname",
+    "username": "username",
+    "password": "password"
+}
+
+###
+
+POST http://localhost:8000/signIn
+Content-Type: application/json
+
+{
+    "username": "username",
+    "password": "password"
+}
 
 ###

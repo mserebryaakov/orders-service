@@ -5,8 +5,10 @@ import (
 	"orders-service/config"
 	_ "orders-service/docs"
 	v1 "orders-service/internal/controller/http/v1"
-	db "orders-service/internal/domain/order/mongodb"
-	service "orders-service/internal/services/order"
+	dbOrder "orders-service/internal/domain/order/mongodb"
+	dbUser "orders-service/internal/domain/user/mongodb"
+	orderService "orders-service/internal/services/order"
+	userService "orders-service/internal/services/user"
 	"orders-service/pkg/httpserver"
 	"orders-service/pkg/logger"
 	"orders-service/pkg/mongodb"
@@ -29,17 +31,26 @@ func Start(cfg config.Config, log *logger.Logger) {
 		panic(err)
 	}
 
+	//Репозиторий пользователей
+	userRepos := dbUser.NewUserRepository(mongoDBClient, cfg.Db.CollectionUser, log)
+	// Сервис пользователей
+	userServices := userService.NewUserService(userRepos)
+	// Handlers пользователей
+	userHandler := v1.NewUserHandler(log, userServices)
+
 	// Репозиторий заказов
-	repos := db.NewOrderRepository(mongoDBClient, cfg.Db.Collection, log)
+	orderRepos := dbOrder.NewOrderRepository(mongoDBClient, cfg.Db.CollectionOrder, log)
 	// Сервис заказов
-	services := service.NewOrderService(repos)
-	// Handlers
-	orderHandler := v1.NewOrdersHandler(log, services)
+	orderServices := orderService.NewOrderService(orderRepos)
+	// Handlers заказов
+	orderHandler := v1.NewOrdersHandler(log, orderServices)
 
 	// Роутер
 	router := gin.New()
 	// Инициализация swagger docs
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// Регистрация user handlers
+	userHandler.Register(router)
 	// Регистрация orders handlers
 	orderHandler.Register(router)
 

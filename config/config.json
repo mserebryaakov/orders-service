@@ -4,12 +4,13 @@
     },
 
     "mongodb": {
-        "host": "mongodb",
+        "host": "localhost",
         "port": "27017",
         "database": "delivery-service",
         "username": null,
         "password": null,
-        "collection": "order",
+        "collection-order": "order",
+        "collection-user": "user",
         "authdb": null
     }
 }

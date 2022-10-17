@@ -34,7 +34,7 @@ func (or *OrderRepository) Create(ctx context.Context, order order.Order) (strin
 		return "", fmt.Errorf("Create order failed: %v", err)
 	}
 
-	or.logger.Debug("covert InsertedID to ObjectID")
+	or.logger.Debug("convert InsertedID to ObjectID")
 	oid, ok := result.InsertedID.(primitive.ObjectID)
 	if ok {
 		return oid.Hex(), nil
