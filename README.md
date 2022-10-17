@@ -1,4 +1,4 @@
-# Order-service - golang сервис для работы с заказами
+## Order-service - golang сервис для работы с заказами
 
 ### Краткое описание:
 
@@ -11,10 +11,10 @@
 
 ### Применены следующие пакеты:
 
-gin - http framework  
+gin - http framework
 viper - конфигурация
 logrus - логирование
-godotenv - переменный окружения
+godotenv - переменные окружения
 swaggo/swag - документация API
 mongo-driver - работа с БД
 
