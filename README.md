@@ -11,12 +11,12 @@
 
 ### Применены следующие пакеты:
 
-gin - http framework
-viper - конфигурация
-logrus - логирование
-godotenv - переменные окружения
-swaggo/swag - документация API
-mongo-driver - работа с БД
+- gin - http framework
+- viper - конфигурация
+- logrus - логирование
+- godotenv - переменные окружения
+- swaggo/swag - документация API
+- mongo-driver - работа с БД
 
 ### Локальное развёртывание:
 
