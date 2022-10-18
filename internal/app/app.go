@@ -52,7 +52,7 @@ func Start(cfg config.Config, log *logger.Logger) {
 	// Регистрация user handlers
 	userHandler.Register(router)
 	// Регистрация orders handlers
-	orderHandler.Register(router)
+	orderHandler.Register(router, userHandler)
 
 	// Создание объекта сервера
 	server := new(httpserver.Server)

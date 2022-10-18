@@ -3,7 +3,6 @@ package v1
 import (
 	"context"
 	"net/http"
-	handlers "orders-service/internal/controller/http"
 	apperror "orders-service/internal/controller/http/apperror"
 	"orders-service/internal/domain/order"
 	service "orders-service/internal/services/order"
@@ -21,7 +20,7 @@ type ordersHandler struct {
 	orderUseCase *service.OrderUseCase
 }
 
-func NewOrdersHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) handlers.Handler {
+func NewOrdersHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) *ordersHandler {
 	return &ordersHandler{
 		log:          log,
 		orderUseCase: orderUseCase,
@@ -29,8 +28,8 @@ func NewOrdersHandler(log *logger.Logger, orderUseCase *service.OrderUseCase) ha
 }
 
 // Регистрация эндпоинтов для работы с заказами
-func (h *ordersHandler) Register(router *gin.Engine) {
-	v1 := router.Group("/v1")
+func (h *ordersHandler) Register(router *gin.Engine, uh *userHandler) {
+	v1 := router.Group("/v1", uh.userIdentity)
 	{
 		v1.POST(orderURL, h.createOrder)
 		v1.GET(orderURL, h.getList)
@@ -54,9 +53,7 @@ func (h *ordersHandler) getList(c *gin.Context) {
 	// Получение id из параметра запроса
 	id := c.Query("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: "Id not found",
-		})
+		newErrorResponse(c, http.StatusBadRequest, "Id not found")
 		return
 	}
 
@@ -66,11 +63,9 @@ func (h *ordersHandler) getList(c *gin.Context) {
 	order, err := h.orderUseCase.FindOne(ctx, id)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			c.Writer.WriteHeader(404)
+			newErrorResponse(c, http.StatusNotFound, "not found order")
 		} else {
-			c.JSON(http.StatusInternalServerError, &UploadResponse{
-				Msg: err.Error(),
-			})
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
@@ -97,9 +92,7 @@ func (h *ordersHandler) createOrder(c *gin.Context) {
 
 	// Валидация body
 	if err := c.BindJSON(&order); err != nil {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: err.Error(),
-		})
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -108,9 +101,7 @@ func (h *ordersHandler) createOrder(c *gin.Context) {
 	// Создание заказа usecase
 	id, err := h.orderUseCase.CreateItem(ctx, order)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, &UploadResponse{
-			Msg: err.Error(),
-		})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -139,9 +130,7 @@ func (h *ordersHandler) updateOrder(c *gin.Context) {
 
 	// Валидация body
 	if err := c.BindJSON(&order); err != nil {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: err.Error(),
-		})
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -151,11 +140,9 @@ func (h *ordersHandler) updateOrder(c *gin.Context) {
 	err := h.orderUseCase.Update(ctx, order)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			c.Writer.WriteHeader(404)
+			newErrorResponse(c, http.StatusNotFound, err.Error())
 		} else {
-			c.JSON(http.StatusInternalServerError, &UploadResponse{
-				Msg: err.Error(),
-			})
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
@@ -180,9 +167,7 @@ func (h *ordersHandler) deleteOrder(c *gin.Context) {
 	// Получение id из параметра запроса
 	id := c.Query("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, &UploadResponse{
-			Msg: "Id not found",
-		})
+		newErrorResponse(c, http.StatusBadRequest, "Id not found")
 		return
 	}
 
@@ -192,11 +177,9 @@ func (h *ordersHandler) deleteOrder(c *gin.Context) {
 	err := h.orderUseCase.Delete(ctx, id)
 	if err != nil {
 		if err == apperror.ErrNotFound {
-			c.Writer.WriteHeader(404)
+			newErrorResponse(c, http.StatusNotFound, err.Error())
 		} else {
-			c.JSON(http.StatusInternalServerError, &UploadResponse{
-				Msg: err.Error(),
-			})
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}

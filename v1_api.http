@@ -1,5 +1,6 @@
-GET http://localhost:8000/v1/order?id=634d3def3d0818b430e07dc5
+GET http://localhost:8000/v1/order?id=634e4edfcc9acce23cddb0ff
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjYxMTk0NTgsImlhdCI6MTY2NjA3NjI1OCwidXNlcl9pZCI6IjYzNGQ3OTA0OWIxZWIxNWQwZjk4ZTU2YiJ9.BPzUHd5ZXO4UGMkch80C0bcPmvb_HuiII1ob_uMmc-A
 
 {}
 
@@ -7,6 +8,7 @@ Content-Type: application/json
 
 POST http://localhost:8000/v1/order
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjYxMTk0NTgsImlhdCI6MTY2NjA3NjI1OCwidXNlcl9pZCI6IjYzNGQ3OTA0OWIxZWIxNWQwZjk4ZTU2YiJ9.BPzUHd5ZXO4UGMkch80C0bcPmvb_HuiII1ob_uMmc-A
 
 {
     "order_status": "ACCEPTED",
@@ -17,6 +19,7 @@ Content-Type: application/json
 
 PUT http://localhost:8000/v1/order
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjYxMTk0NTgsImlhdCI6MTY2NjA3NjI1OCwidXNlcl9pZCI6IjYzNGQ3OTA0OWIxZWIxNWQwZjk4ZTU2YiJ9.BPzUHd5ZXO4UGMkch80C0bcPmvb_HuiII1ob_uMmc-A
 
 {
     "id": "634ac85d5de5b1c46d862201",
@@ -28,12 +31,13 @@ Content-Type: application/json
 
 DELETE http://localhost:8000/v1/order?id=634ac85d5de5b1c46d862201
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjYxMTk0NTgsImlhdCI6MTY2NjA3NjI1OCwidXNlcl9pZCI6IjYzNGQ3OTA0OWIxZWIxNWQwZjk4ZTU2YiJ9.BPzUHd5ZXO4UGMkch80C0bcPmvb_HuiII1ob_uMmc-A
 
 {}
 
 ###
 
-POST http://localhost:8000/signUp
+POST http://localhost:8000/auth/signUp
 Content-Type: application/json
 
 {
@@ -45,7 +49,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:8000/signIn
+POST http://localhost:8000/auth/signIn
 Content-Type: application/json
 
 {
