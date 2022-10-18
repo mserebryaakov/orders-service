@@ -45,9 +45,9 @@ func (h *ordersHandler) Register(router *gin.Engine, uh *userHandler) {
 // @Produce      application/json
 // @Param        id query string true "Order ID"
 // @Success      200  {object}  order.Order "Success get order"
-// @Failure		 400  {object}  UploadResponse "Invalid parameters"
-// @Failure		 404  {object}  UploadResponse "Order not found"
-// @Failure		 500  {object}  UploadResponse "Server error"
+// @Failure		 400  {object}  errorResponse "Invalid parameters"
+// @Failure		 404  {object}  errorResponse "Order not found"
+// @Failure		 500  {object}  errorResponse "Server error"
 // @Router       /v1/order [get]
 func (h *ordersHandler) getList(c *gin.Context) {
 	// Получение id из параметра запроса
@@ -84,8 +84,8 @@ func (h *ordersHandler) getList(c *gin.Context) {
 // @Produce      application/json
 // @Param        order body order.Order true "Order object"
 // @Success      200  {object}  IdResponse "Success create"
-// @Failure		 400  {object}  UploadResponse "Invalid body"
-// @Failure		 500  {object}  UploadResponse "Server error"
+// @Failure		 400  {object}  errorResponse "Invalid body"
+// @Failure		 500  {object}  errorResponse "Server error"
 // @Router       /v1/order [post]
 func (h *ordersHandler) createOrder(c *gin.Context) {
 	var order order.Order
@@ -121,9 +121,9 @@ func (h *ordersHandler) createOrder(c *gin.Context) {
 // @Produce      application/json
 // @Param        order body order.Order true "Order object"
 // @Success      200
-// @Failure		 400  {object}  UploadResponse "Invalid body"
-// @Failure		 404  {object}  UploadResponse "Order not found"
-// @Failure		 500  {object}  UploadResponse "Server error"
+// @Failure		 400  {object}  errorResponse "Invalid body"
+// @Failure		 404  {object}  errorResponse "Order not found"
+// @Failure		 500  {object}  errorResponse "Server error"
 // @Router       /v1/order [put]
 func (h *ordersHandler) updateOrder(c *gin.Context) {
 	var order order.Order
@@ -159,9 +159,9 @@ func (h *ordersHandler) updateOrder(c *gin.Context) {
 // @Description  Delete order by ID
 // @Param        id query string true "Order ID"
 // @Success      200
-// @Failure		 400  {object}  UploadResponse "Invalid parameters"
-// @Failure		 404  {object}  UploadResponse "Order not found"
-// @Failure		 500  {object}  UploadResponse "Server error"
+// @Failure		 400  {object}  errorResponse "Invalid parameters"
+// @Failure		 404  {object}  errorResponse "Order not found"
+// @Failure		 500  {object}  errorResponse "Server error"
 // @Router       /v1/order [delete]
 func (h *ordersHandler) deleteOrder(c *gin.Context) {
 	// Получение id из параметра запроса

@@ -16,6 +16,122 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/sign-in": {
+            "post": {
+                "description": "authentification account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "SignIn",
+                "parameters": [
+                    {
+                        "description": "account info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserSignUpDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-up": {
+            "post": {
+                "description": "create account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "SignUp",
+                "parameters": [
+                    {
+                        "description": "account info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/order": {
             "get": {
                 "description": "Get order by ID",
@@ -45,19 +161,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid parameters",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     }
                 }
@@ -92,19 +208,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid body",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     }
                 }
@@ -142,13 +258,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid body",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     }
                 }
@@ -175,19 +291,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid parameters",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/v1.UploadResponse"
+                            "$ref": "#/definitions/v1.errorResponse"
                         }
                     }
                 }
@@ -197,6 +313,10 @@ const docTemplate = `{
     "definitions": {
         "order.Order": {
             "type": "object",
+            "required": [
+                "customer_id",
+                "order_status"
+            ],
             "properties": {
                 "customer_id": {
                     "type": "string"
@@ -209,6 +329,44 @@ const docTemplate = `{
                 }
             }
         },
+        "user.User": {
+            "type": "object",
+            "required": [
+                "firstname",
+                "lastname",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserSignUpDTO": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.IdResponse": {
             "type": "object",
             "properties": {
@@ -217,13 +375,20 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UploadResponse": {
+        "v1.errorResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

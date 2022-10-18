@@ -32,8 +32,8 @@ func NewUserHandler(log *logger.Logger, userUseCase *service.UserUseCase) *userH
 func (h *userHandler) Register(router *gin.Engine) {
 	auth := router.Group("/auth")
 	{
-		auth.POST("/signUp", h.signUp)
-		auth.POST("/signIn", h.signIn)
+		auth.POST("/sign-up", h.signUp)
+		auth.POST("/sign-in", h.signIn)
 	}
 }
 
@@ -67,6 +67,17 @@ func (h *userHandler) userIdentity(c *gin.Context) {
 }
 
 // Регистрация пользователя
+// @Summary SignUp
+// @Tags auth
+// @Description create account
+// @Accept  json
+// @Produce  json
+// @Param input body user.User true "account info"
+// @Success 200 {string} IdResponse
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /auth/sign-up [post]
 func (h *userHandler) signUp(c *gin.Context) {
 	var user user.User
 
@@ -92,6 +103,17 @@ func (h *userHandler) signUp(c *gin.Context) {
 }
 
 // Аутентификация пользователя
+// @Summary SignIn
+// @Tags auth
+// @Description authentification account
+// @Accept  json
+// @Produce  json
+// @Param input body user.UserSignUpDTO true "account info"
+// @Success 200 {string} TokenResponse
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /auth/sign-in [post]
 func (h *userHandler) signIn(c *gin.Context) {
 	var user user.UserSignUpDTO
 
